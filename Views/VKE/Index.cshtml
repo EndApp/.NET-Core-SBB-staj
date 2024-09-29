@@ -1,0 +1,73 @@
+@model Staj.Web.Models.VKEModel
+<div class="p-5">
+<div class="card text-center p-5">
+    <div class="card-body ">
+        <h5 class="card-title">Vücut Kitle Endeksi Hesaplama</h5>
+        <div class="form-group">
+            <label for="Boy">Boy (Cm)</label>
+            <input type="text" class="form-control" id="Boy" name="Boy" required>
+
+            <label for="Kilo">Kilo (kg)</label>
+            <input type="text" class="form-control" id="Kilo" name="Kilo" required>
+<br>
+            <button id="hesaplaBtn" class="btn btn-success">Hesapla</button>
+            <button id="resetBtn" class="btn btn-danger" type="button">Reset</button>
+        </div>
+        <br>
+
+        <p id="VKESonuc"></p>
+    </div>
+
+    <div class="p-5 row justify-content-evenly">
+        <div class="ms-md col-sm-6 col-md-5 col-lg-3" style="background-color: green;">
+            -18.5 Under <br> Weight
+        </div>
+        <div class="ms-md col-sm-6 col-md-5 col-lg-3" style="background-color: rgb(47, 0, 255);">
+            18.5-25<br> Normal
+        </div>
+        <div class="ms-md col-sm-6 col-md-5 col-lg-3" style="background-color: rgb(255, 251, 0);">
+            25-30<br> Over Weight
+        </div>
+        <div class="ms-md col-sm-6 col-md-5 col-lg-3" style="background-color: red;">
+            30- <br>Obese
+        </div>
+    </div>
+</div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () { //sayfa yuklendıgınde calısır (domun tam yuklendıgınden emın olmak ıcın)
+            $("#hesaplaBtn").click(function () {            // Hesapla butonuna tıklayınca
+                var Boy = parseFloat($("#Boy").val()); //inputu floata döndür
+                var Kilo = parseFloat($("#Kilo").val());
+
+                if (!isNaN(Boy) && !isNaN(Kilo)) { //boy kilo geçerli sayımı
+                    $.ajax({
+                        type: "POST", //post la veri gönder
+                        url: "@Url.Action("Hesapla", "VKE")", //hesapla eylem metoduna vke ıcınde ıstek gonderır
+                        data: { //sunucuya gonderılecek verıler
+                            "Boy": Boy,
+                            "Kilo": Kilo
+                        },
+                        success: function (data) { // ajax basarılıysa donen verıyı VKESONUC a yazdır
+                            $("#VKESonuc").text("Vücut Kitle Endeksi (VKE): " + data.vke.toFixed(2));
+                            $("#VKESonuc").append("<br> Durum: " + data.sonuc);
+                        },
+                        error: function () { //ajax basarısızsa
+                            alert("Hesaplama sırasında bir hata oluştu.");
+                        }
+                    });
+                } else {
+                    alert("Lütfen geçerli bir Boy ve Kilo değeri girin.");
+                }
+            });
+
+            // Reset butonuna tıklanınca
+            $("#resetBtn").click(function () {
+                $("#Boy").val("");  // Boy inputunu temizle
+                $("#Kilo").val(""); // Kilo inputunu temizle
+                $("#VKESonuc").text(""); // Sonucu temizle
+            });
+        });
+    </script>
+}

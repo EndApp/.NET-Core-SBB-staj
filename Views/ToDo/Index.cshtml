@@ -1,0 +1,109 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+
+@model List<ToDoModel> //todo model yapılacak işleri tutar bu sayfanın modelıdır
+
+<h2>To Do Listesi</h2>
+
+<form id="todoForm">
+    <div class="form-group">
+        <input id="toDoEkle" name="Description" class="form-control" placeholder="Yeni iş ekle" />
+        <span class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Ekle</button>
+</form>
+
+<div id="todoList">
+    @if (Model.Count > 0) //eklenen iş varsa işleri listele
+    {
+        <ul class="list-group">
+            @foreach (var item in Model)
+            {
+                <li class="list-group-item" data-id="@item.Id">
+                    @item.Description
+                    <input type="checkbox" onclick="toggleIsDone(@item.Id, this.checked)" @Html.Raw(item.IsDone ? "checked" : "" )> 
+                    <button class="btn btn-danger btn-sm float-right" onclick="deleteToDo(@item.Id)">Sil</button>
+                </li>
+            }
+        </ul>
+    }
+    else //iş yoksa yok de
+    {
+        <ul class="list-group">
+            <li>Henüz bir iş eklenmemiş.</li>
+        </ul>
+    }
+</div>
+
+@section Scripts{
+    <script>
+
+
+  document.getElementById('todoForm').addEventListener('submit', function(event) { //formun submıt olayını yakala
+        event.preventDefault(); // Formun varsayılan submit davranışını engelle
+       
+        var formData = {
+            Description: $("#toDoEkle").val()  //form verılerını alır
+        };
+        $.ajax({ //ajax isteği yapar ve url ye gonderır başarılı olursa ekler ve inputu temızler
+            type: "POST",
+            url: "/ToDo/Create",
+            data: formData,
+            success: function (data) {
+
+                var listItem = '<li class="list-group-item" data-id="' + data.id + '">' +
+                    data.description +
+                    '<input type="checkbox" onclick="toggleIsDone(' + data.id + ', this.checked)" ' +
+                    (data.isDone ? "checked" : "") + '>' +
+                    '<button class="btn btn-danger btn-sm float-right" onclick="deleteToDo(' + data.id + ')">Sil</button>' +
+                    '</li>';
+                $("#todoList ul").append(listItem);
+
+                $("#toDoEkle").val("");
+
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+                alert("Hata oluştu: " + xhr.responseText);
+            }
+        });
+
+});
+
+
+function toggleIsDone(todoId, isChecked) { //işinin tamamlanıp tamamlanmadıgı tik
+    var formData = {
+        Id: todoId,
+        IsDone: isChecked
+    };
+
+    $.ajax({ //ajaxla iş tamamlama durumu degıstırır
+        type: "POST",
+        url: "@Url.Action("ToggleIsDone", "ToDo")",
+        data: formData,
+        success: function (data) {
+            $("li[data-id='" + todoId + "']").toggleClass("done", isChecked);
+        },
+        error: function (xhr, status, error) {
+            console.error(error);
+        }
+    });
+}
+
+function deleteToDo(todoId) {
+    $.ajax({ //basarılı olurda ajax isteği yapar ve  işi siler
+        type: "POST",
+        url: "@Url.Action("Delete", "ToDo")",
+        data: { id: todoId },
+        success: function () {
+            $("li[data-id='" + todoId + "']").remove();
+        },
+        error: function (xhr, status, error) {
+            console.error(error);
+            alert("Hata oluştu: " + error.responseText);
+        }
+    });
+}
+    </script>
+}

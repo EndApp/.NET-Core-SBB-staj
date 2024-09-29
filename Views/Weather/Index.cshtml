@@ -1,0 +1,185 @@
+@model IEnumerable<WeatherModels>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/4.2.0/mdb.min.css" rel="stylesheet" />
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-4 mt-3">
+            <div class="card p-4 shadow" style="color: #4B515D; border-radius: 35px; height: 100%;">
+
+                <div class="row justify-content-center">
+                    <div class="col-md-12 mt-3 mb-3">
+                        <header class="text-center pb-5">
+                            <h1 class="h2"><i class="fa fa-temperature-half text-black"></i>Hava Durumu</h1>
+                        </header>
+
+                        <div class="card shadow mb-2" style="color: #4B515D; border-radius: 35px;">
+                            <div class="card-body p-4">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="city" placeholder="Şehir" aria-label="City" aria-describedby="basic-addon2">
+                                    <div class="input-group-append">
+                                        <button id="search" class="btn btn-outline-secondary" style="height: 35px;" type="button">Ara</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card shadow" style="color: #4B515D; border-radius: 35px; display: none;" id="searchBox">
+                            <div class="card-body p-4">
+                                <div class="d-flex">
+                                    <h6 class="flex-grow-1" id="title"></h6>
+                                    <h6 id="country"></h6>
+                                </div>
+
+                                <div class="d-flex flex-column text-center mt-5 mb-4">
+                                    <h6 class="display-4 mb-0 font-weight-bold" style="color: #1C2331;" id="temp"> </h6>
+                                    <span class="small" style="color: #868B94" id="description"></span>
+                                </div>
+
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-grow-1" style="font-size: 1rem;">
+                                        <div>
+                                            <i class="fas fa-wind fa-fw" style="color: #868B94;"></i> <span class="ms-1" id="wind">
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <i class="fas fa-tint fa-fw" style="color: #868B94;"></i> <span class="ms-1" id="humidity"> </span>
+                                        </div>
+                                        <div>
+                                            <i class="fas fa-sun fa-fw" style="color: #868B94;"></i> <span class="ms-1" id="sun">  </span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <img id="image" src="" width="100px">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow" style="color: #4B515D; border-radius: 35px; display: none;" id="error">
+                            <div class="card-body p-4">
+                                <div class="d-flex">
+                                    <h6 class="flex-grow-1" id="er1">Hata</h6>
+                                </div>
+                                <div class="d-flex flex-column text-center mt-5 mb-4">
+                                    <h2 style="color: #1C2331;" id="er2">Bulunamadı</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="row" id="list">
+                @foreach (var item in Model) //her ıtem ıcın kart olustur ! şehir adı ülke kısaltması sıcaklık gıbı degerler ve havadurumu ıkonu
+                {
+                    <div class="col-md-6 mt-3" id="item">
+                        <div class="card shadow" style="color: #4B515D; border-radius: 35px;">
+                            <div class="card-body p-4">
+                                <div class="d-flex">
+                                    <h6 class="flex-grow-1">@item?.name</h6>
+                                    <h6>@item?.sys?.country</h6> 
+                                </div>
+
+                                <div class="d-flex flex-column text-center mt-4 mb-4">
+                                    <h6 class="display-4 mb-1 font-weight-bold" style="color: #1C2331;" id="@item?.id">
+                                     @(string.Format("{0:F1}", (item?.main?.temp - 273.15))) °C  
+                                    </h6>
+                                    <span style="font-size:20px" style="color: #868B94">@item?.weather?[0]?.description</span>
+                                </div>
+
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-grow-1" style="font-size: 1rem;">
+                                        <div>
+                                            <i class="fas fa-wind fa-fw" style="color: #868B94;"></i> <span class="ms-1">@item?.wind?.speed m/s</span>
+                                        </div>
+                                        <div>
+                                            <i class="fas fa-tint fa-fw" style="color: #868B94;"></i> <span class="ms-1">@item?.main?.humidity% </span>
+                                        </div>
+                                        <div>
+                                            <i class="fas fa-sun fa-fw" style="color: #868B94;"></i> <span class="ms-1" id="@item?.sys?.sunrise"> 0.2 h</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <img src="@("https://openweathermap.org/img/wn/" + item?.weather?[0]?.icon + "@2x.png")" width="100px">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        // JavaScript kodunu Razor içinde kullanmak 
+                        //virgülden sonra 1 basamak olsun ve derece cınsınden gostersın kontrolu
+                    <script type="text/javascript">
+                        $(document).ready(function () {
+                            var tempCelsius = parseFloat('@item?.main?.temp') - 273.15;
+                            $("#" + '@item?.id').html(tempCelsius.toFixed(1) + '°C');   
+
+                            var date = new Date(parseInt('@item?.sys?.sunrise') * 1000);
+                            var hours = date.getHours();
+                            var minutes = "0" + date.getMinutes();
+                            var seconds = "0" + date.getSeconds();
+                            var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+
+                            $("#" + '@item?.sys?.sunrise').html(formattedTime);
+                        });
+                    </script>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $("#search").click(function () { //ara butonuna basınca calıstır fonku
+            $.ajax({
+                type: "POST",
+                data: {
+                    'city': $("#city").val(),
+                },
+                url: "/Weather/SearchWeather/",
+                cache: false,   
+                success: function (data) {
+                    console.log(data); 
+                    if (data.name == null) { //ismin karşılıgı yoksa şehir bulunamadı
+                        $("#er2").html("Bulunamadi");
+                        $("#searchBox").fadeOut(1);
+                        $("#error").fadeIn(500);
+                    } else { //varsa bılgılerı alır
+                        $("#title").html(data.name);
+                        $("#country").html(data.sys.country);
+                        $("#temp").html((parseFloat(data.main.temp) - 273.15).toFixed(1) + '°C');
+                        $("#wind").html(data.wind.speed + " m/s");
+                        $("#humidity").html(data.main.humidity + "%");
+                        $("#description").html(data.weather[0].description);
+                        $("#image").attr("src", "https://openweathermap.org/img/wn/" + data.weather[0].icon + "@@2x.png");
+
+                        var date = new Date(data.sys.sunrise * 1000);
+                        var hours = date.getHours();
+                        var minutes = "0" + date.getMinutes();
+                        var seconds = "0" + date.getSeconds();
+                        var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+                        $("#sun").html(formattedTime);
+
+                        $("#error").fadeOut(1);
+                        $("#searchBox").fadeIn(500);
+                        $("#item").last().after($("#item").first());
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status);
+                    alert(thrownError);
+                }
+            });
+        });
+    });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/4.2.0/mdb.min.js"></script>

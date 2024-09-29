@@ -1,0 +1,52 @@
+@model OzluSozModel
+<div class="p-5">
+<div class="card text-center mb-3">
+    <div class="card-header bg-secondary">
+        <h1>Rastgele Özlü Söz Uygulaması</h1>
+    </div>
+    <div class="card-body">
+        <p id="ozluSoz" class="card-text" style="color:red">...</p>
+        <p id="sozSahibi" class="card-text">...</p>
+
+        <button id="tekrarBtn">
+            <img src="./resimler/reload.png" style="height: 34px; width: 30px;">
+        </button>
+        <a id="paylasBtn" href="#">
+            <img src="./resimler/twitter.png" style="width: 40px;">
+        </a>
+    </div>
+    <div class="bg-secondary card-footer text-body-secondary"></div>
+</div>
+</div>
+@section Scripts {
+    <script>
+        function getRastgeleSoz() {
+            $.ajax({
+                type: "GET", //getle veri al
+                url: "@Url.Action("RastgeleSoz", "OzluSoz")", //rastgelesoz metoduna ozlusoz ıcınde ıstek gonderır
+                success: function (data) {// ajax basarılıysa donen verıyı degiskenlere  yazdır
+                    console.log(data);
+                    $("#ozluSoz").text(data.text);
+                    $("#sozSahibi").text(data.author);
+                },
+                error: function () { //hata
+                    alert("Özlü söz alınırken bir hata oluştu.");
+                }
+            });
+        }
+
+        $(document).ready(function () { //sayfa yuklendıgınde rastgele soz getirir 
+            getRastgeleSoz();
+        });
+
+        $("#tekrarBtn").click(function () { //tekrar butona tıklayınca getırır
+            getRastgeleSoz();
+        });
+
+        $("#paylasBtn").click(function () { //paylas butonuna tıklanınca x de YazStaj hashtagiyle paylaşır 
+            var ozluSoz = $("#ozluSoz").text();
+            var xLink = "https://x.com/intent/tweet?hashtags=YazStaj&text=" + encodeURIComponent(ozluSoz);
+            window.open(xLink, '_blank');
+        });
+    </script>
+}

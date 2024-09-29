@@ -1,0 +1,23 @@
+﻿@model List<Staj.Web.Models.AppModel>
+
+@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-right">
+        @foreach (var app in Model) // razor şablonları dinamik döndürür her öğe için
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card text-bg-dark h-100">
+                    <img src="@app.Fotograf" class="card-img-top" alt="@app.Ad" style="width:%100;height:200px">
+                    <div class="card-body">
+                        <h5 class="card-title">@app.Ad</h5>
+                        <p class="card-text">@app.Aciklama</p>
+                        <a href="@app.Url" class="btn btn-primary">@app.Ad</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
